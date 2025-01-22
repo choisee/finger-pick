@@ -13,7 +13,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: black;
+        background-color: white;
         overflow: hidden;
       }
 
@@ -85,21 +85,37 @@
       .firework2:nth-child(odd) {
         background-color: #0f0;
       }
+      #timerDisplay {
+        position: absolute;
+        top: 0;
+        margin: 0 auto;
+        font-size: 25px;
+        font-weight: bold;
+        color: #333;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px;
+        border-radius: 10px;
+      }
     </style>
   </head>
 
   <body>
     <div id="gameArea"></div>
     <div id="fireworks" class="hidden"></div>
+    <div id="timerDisplay">0:05</div>
+    <!-- Pomodoro-like Timer Display -->
     <!-- Fireworks container -->
     <script>
       // Select the game area (the screen)
       const gameArea = document.getElementById("gameArea");
       const fireworksContainer = document.getElementById("fireworks");
+      const timerDisplay = document.getElementById("timerDisplay");
 
-      // Store active touches
-      let touches = [];
+      let touches = []; // Store active touches
       let timeoutID = null; // Timeout to track inactivity
+      let isGameActive = true; // Flag to control game activity (whether touches are allowed or not)
+      let WAIT_FINGER = 5; //sec
+      let timerValue = WAIT_FINGER; // 5 minutes in seconds (300s)
 
       // Function to highlight touched areas
       function highlightTouch(touch) {
@@ -119,17 +135,21 @@
         // Clear previous timeout and set a new one to check for inactivity
         if (timeoutID) {
           clearTimeout(timeoutID);
+          timerValue = WAIT_FINGER + 1;
+          updateTimer();
         }
 
         // Wait for 1 second after the last touch before starting to randomly remove highlights
         timeoutID = setTimeout(() => {
           // Start the interval to remove highlights randomly after 1 second
           startRandomHighlightRemoval();
-        }, 1000);
+        }, 1000 * WAIT_FINGER);
       }
 
       // Function to start removing highlights randomly
       function startRandomHighlightRemoval() {
+        isGameActive = false; // Disable further touch events
+
         let interval = setInterval(() => {
           // If there is only 1 touch left, stop removing and trigger fireworks
           if (touches.length === 1) {
@@ -152,18 +172,6 @@
         }, 1000); // Remove one highlight every 1 second
       }
 
-      // Track touch start event
-      gameArea.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Prevent default scrolling/zoom behavior
-
-        // Only proceed if the number of touches is less than or equal to the maximum allowed
-        if (touches.length < 10) {
-          // You can adjust this limit
-          const touch = e.changedTouches[0]; // Get the first touch (for simplicity, we use only one touch)
-          highlightTouch(touch);
-        }
-      });
-
       // Function to trigger fireworks animation
       function triggerFireworks() {
         fireworksContainer.classList.remove("hidden");
@@ -182,8 +190,9 @@
       // Function to create a group of fireworks
       function createFireworks(count, delay) {
         for (let i = 0; i < count; i++) {
+          console.log("test - count : ", count);
           const firework = document.createElement("div");
-          firework.classList.add("firework" + (i % 2));
+          firework.classList.add("firework" + (i % 3));
 
           // Random position and animation timing for fireworks
           firework.style.left = `${Math.random() * window.innerWidth}px`;
@@ -200,6 +209,39 @@
           fireworksContainer.classList.add("hidden");
         }, delay + 3000); // Hide after 3 seconds from last firework
       }
+
+      // Function to update the timer display
+      function updateTimer() {
+        if (timerValue <= 0) {
+          clearInterval(timerInterval); // Stop the timer once it's 0
+          return;
+        }
+
+        // Update the timer value (subtract 1 second each time)
+        timerValue--;
+
+        // Convert timer value into minutes and seconds format
+        const minutes = Math.floor(timerValue / 60);
+        const seconds = timerValue % 60;
+        timerDisplay.textContent = `${minutes}:${
+          seconds < 10 ? "0" : ""
+        }${seconds}`;
+      }
+
+      // Start the Pomodoro-like timer
+      let timerInterval = setInterval(updateTimer, 1000);
+
+      // Track touch start event
+      gameArea.addEventListener("touchstart", (e) => {
+        e.preventDefault(); // Prevent default scrolling/zoom behavior
+
+        // Only proceed if the number of touches is less than or equal to the maximum allowed
+        if (touches.length < 10 && isGameActive) {
+          const touch = e.changedTouches[0]; // Get the first touch (for simplicity, we use only one touch)
+          highlightTouch(touch);
+        }
+      });
+
       // Track touch move event
       gameArea.addEventListener("touchmove", (e) => {
         // Prevent default scroll/zoom behavior
