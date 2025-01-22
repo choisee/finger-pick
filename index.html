@@ -143,6 +143,18 @@
       #timerDisplay.hidden {
         display: none;
       }
+      #resultMessage {
+        position: absolute;
+        margin: auto;
+        top: 15px;
+        font-size: 20px;
+        font-weight: bold;
+        color: magenta;
+        text-align: center;
+      }
+      #resultMessage.hidden {
+        display: none;
+      }
       /* Reset Button Styling */
       #resetButton {
         position: absolute;
@@ -167,7 +179,7 @@
     <div id="gameArea"></div>
     <div id="fireworks" class="hidden"></div>
     <div id="timerDisplay">0:03</div>
-    <!-- update with WAIT_FINGER -->
+    <div id="resultMessage" class="hidden">당첨!!</div>
     <button id="resetButton" class="hidden">다시하기</button>
 
     <script>
@@ -175,6 +187,7 @@
       const gameArea = document.getElementById("gameArea");
       const fireworksContainer = document.getElementById("fireworks");
       const timerDisplay = document.getElementById("timerDisplay");
+      const resultMessage = document.getElementById("resultMessage");
       const resetButton = document.getElementById("resetButton");
 
       let touches = []; // Store active touches
@@ -259,6 +272,7 @@
 
         // Show the reset button after fireworks finish
         setTimeout(() => {
+          resultMessage.classList.remove("hidden");
           resetButton.classList.remove("hidden");
         }, 500); // Show after fireworks animation ends (3 seconds)
       }
@@ -266,7 +280,6 @@
       // Function to create a group of fireworks
       function createFireworks(count, delay) {
         for (let i = 0; i < count; i++) {
-          console.log("test - count : ", count);
           const firework = document.createElement("div");
           firework.classList.add("firework" + (i % 3));
 
@@ -293,7 +306,7 @@
           if (touches.length === 0) {
             // Disable touch events and show reset button when the timer hits 0:00
             isGameActive = false;
-            resetButton.classList.remove("hidden"); // Show the reset button
+            resetButton.classList.remove("hidden");
           }
           return;
         }
@@ -352,6 +365,7 @@
         timerDisplay.textContent = "0:03"; // update with WAIT_FINGER
         timerDisplay.classList.remove("hidden");
 
+        resultMessage.classList.add("hidden");
         // Hide the reset button and restart the timer
         resetButton.classList.add("hidden");
         clearInterval(timerInterval);
