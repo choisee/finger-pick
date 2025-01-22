@@ -213,19 +213,27 @@
 
       function startRandomHighlightRemoval() {
         isGameActive = false;
+        // isRandomRemovalInProgress = true; // Track that random highlight removal is in progress
+
         timerDisplay.classList.add("hidden");
 
         let interval = setInterval(() => {
           if (touches.length === 1) {
             clearInterval(interval);
+            isRandomRemovalInProgress = false; // Stop the random removal process
             triggerFireworks();
             return;
           }
-          const randomIndex = Math.floor(Math.random() * touches.length);
-          const touchToRemove = touches[randomIndex];
+          //   const randomIndex = Math.floor(Math.random() * touches.length);
+          //   const touchToRemove = touches[randomIndex];
 
+          // Shuffle the touches array randomly
+          shuffleArray(touches);
+          //   Remove the first element (this is now a random touch due to shuffling)
+          const touchToRemove = touches.pop(); // Get the last element after shuffling
+
+          // Fade out the random touch highlight
           touchToRemove.style.opacity = "0";
-
           setTimeout(() => {
             gameArea.removeChild(touchToRemove);
             touches.splice(randomIndex, 1);
@@ -321,6 +329,13 @@
 
         fireworksContainer.classList.add("hidden");
         timeoutID = null;
+      }
+      // Function to shuffle the array (Fisher-Yates algorithm)
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
       }
     </script>
   </body>
