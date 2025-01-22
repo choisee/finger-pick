@@ -37,8 +37,8 @@
 
       .touchHighlight {
         position: absolute;
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
         background: radial-gradient(
           circle,
@@ -48,8 +48,24 @@
         box-shadow: 0 0 15px 5px rgba(255, 10, 157, 0.5);
         pointer-events: none;
         transition: opacity 0.5s ease-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        color: white;
+        font-weight: bold;
       }
 
+      .touchNumber {
+        position: absolute;
+        font-size: 40px;
+        color: white;
+        font-weight: bold;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+      }
       @keyframes pulse {
         0% {
           transform: scale(1);
@@ -181,6 +197,7 @@
       const resultMessage = document.getElementById("resultMessage");
       const resetButton = document.getElementById("resetButton");
 
+      let touchCounter = 1;
       let touches = [];
       let timeoutID = null;
       let isGameActive = true;
@@ -193,8 +210,17 @@
         touchElement.classList.add("touchHighlight");
         touchElement.classList.add("pulse");
 
-        touchElement.style.left = `${touch.clientX - 25}px`;
-        touchElement.style.top = `${touch.clientY - 25}px`;
+        const numberElement = document.createElement("div");
+        numberElement.classList.add("touchNumber");
+        numberElement.textContent = touchCounter++;
+
+        // touchElement.style.left = `${touch.clientX - 25}px`;
+        // touchElement.style.top = `${touch.clientY - 25}px`;
+
+        touchElement.style.left = `${touch.clientX - 30}px`;
+        touchElement.style.top = `${touch.clientY - 30}px`;
+
+        touchElement.appendChild(numberElement);
 
         gameArea.appendChild(touchElement);
 
@@ -316,6 +342,7 @@
       function resetGame() {
         touches.forEach((touch) => gameArea.removeChild(touch));
         touches = [];
+        touchCounter = 1;
 
         isGameActive = true;
         timerValue = WAIT_FINGER;
