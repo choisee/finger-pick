@@ -10,6 +10,7 @@
         width: 100%;
         height: 100%;
         margin: 0;
+        padding: 0;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -18,10 +19,21 @@
       }
 
       #gameArea {
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         position: relative;
         background-color: black;
+        overflow: hidden;
+      }
+
+      /* Optional: Hide scrollbars for the entire page */
+      ::-webkit-scrollbar {
+        display: none; /* For webkit-based browsers like Chrome and Safari */
+      }
+
+      * {
+        -ms-overflow-style: none; /* For Internet Explorer */
+        scrollbar-width: none; /* For Firefox */
       }
 
       .touchHighlight {
