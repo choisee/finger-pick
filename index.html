@@ -245,6 +245,11 @@
       function updateTimer() {
         if (timerValue <= 0) {
           clearInterval(timerInterval); // Stop the timer once it's 0
+          if (touches.length === 0) {
+            // Disable touch events and show reset button when the timer hits 0:00
+            isGameActive = false;
+            resetButton.classList.remove("hidden"); // Show the reset button
+          }
           return;
         }
 
