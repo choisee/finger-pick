@@ -61,6 +61,22 @@
         border-radius: 50%;
         animation: fireworks 1s ease-out forwards;
       }
+      .firework2 {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #ff0;
+        border-radius: 50%;
+        animation: fireworks 2s ease-out forwards;
+      }
+      .firework3 {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #ff0;
+        border-radius: 50%;
+        animation: fireworks 2s ease-out forwards;
+      }
 
       .firework:nth-child(even) {
         background-color: #f00;
@@ -115,12 +131,12 @@
       // Function to start removing highlights randomly
       function startRandomHighlightRemoval() {
         let interval = setInterval(() => {
-          if (touches.length === 0) {
+          // If there is only 1 touch left, stop removing and trigger fireworks
+          if (touches.length === 1) {
             clearInterval(interval);
-            alert("Winner! All highlights removed.");
+            triggerFireworks();
             return;
           }
-
           // Randomly pick an index from the active touches
           const randomIndex = Math.floor(Math.random() * touches.length);
           const touchToRemove = touches[randomIndex];
@@ -147,6 +163,30 @@
           highlightTouch(touch);
         }
       });
+
+      // Function to trigger fireworks animation
+      function triggerFireworks() {
+        fireworksContainer.classList.remove("hidden");
+        fireworksContainer.innerHTML = ""; // Clear any previous fireworks
+
+        // Create multiple firework elements
+        for (let i = 0; i < 10; i++) {
+          const firework = document.createElement("div");
+          firework.classList.add("firework");
+
+          // Random position and animation timing for fireworks
+          firework.style.left = `${Math.random() * window.innerWidth}px`;
+          firework.style.top = `${Math.random() * window.innerHeight}px`;
+
+          // Add firework to the container
+          fireworksContainer.appendChild(firework);
+        }
+
+        // Hide fireworks after animation completes
+        setTimeout(() => {
+          fireworksContainer.classList.add("hidden");
+        }, 5000); // After 1 second, hide the fireworks
+      }
 
       // Track touch move event
       gameArea.addEventListener("touchmove", (e) => {
