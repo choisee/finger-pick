@@ -32,19 +32,60 @@
         background-color: rgba(255, 0, 0, 0.5);
         pointer-events: none;
       }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Fireworks animation */
+      @keyframes fireworks {
+        0% {
+          transform: scale(0);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.5);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(3);
+          opacity: 0;
+        }
+      }
+
+      .firework {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #ff0;
+        border-radius: 50%;
+        animation: fireworks 1s ease-out forwards;
+      }
+
+      .firework:nth-child(even) {
+        background-color: #f00;
+      }
+
+      .firework:nth-child(odd) {
+        background-color: #0f0;
+      }
     </style>
   </head>
 
   <body>
     <div id="gameArea"></div>
+    <div id="fireworks" class="hidden"></div>
+    <!-- Fireworks container -->
     <script>
       // Select the game area (the screen)
       const gameArea = document.getElementById("gameArea");
+      const fireworksContainer = document.getElementById("fireworks");
 
       // Store active touches
       let touches = [];
+      let timeoutID = null; // Timeout to track inactivity
 
-      // Create a function to highlight touched areas
+      // Function to highlight touched areas
       function highlightTouch(touch) {
         const touchElement = document.createElement("div");
         touchElement.classList.add("touchHighlight");
@@ -59,51 +100,49 @@
         // Add this touch to the active touches array
         touches.push(touchElement);
 
-        if (touches.length === 3) {
-          let interval = setInterval(() => {
-            // If there are no more touches left, stop the interval
-            if (touches.length === 0) {
-              clearInterval(interval);
-              alert("Winner! All highlights removed.");
-              return;
-            }
-
-            // Randomly pick an index from the active touches
-            const randomIndex = Math.floor(Math.random() * touches.length);
-            const touchToRemove = touches[randomIndex];
-
-            // Fade out the random touch highlight
-            touchToRemove.style.opacity = "0";
-
-            // Remove it from the touches array and DOM after fading
-            setTimeout(() => {
-              gameArea.removeChild(touchToRemove);
-              touches.splice(randomIndex, 1); // Remove from the touches array
-            }, 500); // Wait a bit to allow fade-out before removing it
-          }, 1000); // Remove one highlight every 1 second
+        // Clear previous timeout and set a new one to check for inactivity
+        if (timeoutID) {
+          clearTimeout(timeoutID);
         }
 
-        // // Set an interval to remove the highlight one by one
-        // if (touches.length === 2) {
-        //   let counter = 0;
-        //   const interval = setInterval(() => {
-        //     if (counter < touches.length) {
-        //       touches[counter].style.opacity = "0"; // Fade the highlight
-        //       counter++;
-        //     } else {
-        //       clearInterval(interval); // Stop the interval once all highlights are off
-        //       alert("Winner! All highlights removed.");
-        //     }
-        //   }, 1000); // Interval of 1 second for each highlight to disappear
-        // }
+        // Wait for 1 second after the last touch before starting to randomly remove highlights
+        timeoutID = setTimeout(() => {
+          // Start the interval to remove highlights randomly after 1 second
+          startRandomHighlightRemoval();
+        }, 1000);
+      }
+
+      // Function to start removing highlights randomly
+      function startRandomHighlightRemoval() {
+        let interval = setInterval(() => {
+          if (touches.length === 0) {
+            clearInterval(interval);
+            alert("Winner! All highlights removed.");
+            return;
+          }
+
+          // Randomly pick an index from the active touches
+          const randomIndex = Math.floor(Math.random() * touches.length);
+          const touchToRemove = touches[randomIndex];
+
+          // Fade out the random touch highlight
+          touchToRemove.style.opacity = "0";
+
+          // Remove it from the touches array and DOM after fading
+          setTimeout(() => {
+            gameArea.removeChild(touchToRemove);
+            touches.splice(randomIndex, 1); // Remove from the touches array
+          }, 500); // Wait a bit to allow fade-out before removing it
+        }, 1000); // Remove one highlight every 1 second
       }
 
       // Track touch start event
       gameArea.addEventListener("touchstart", (e) => {
         e.preventDefault(); // Prevent default scrolling/zoom behavior
 
-        // Only proceed if the number of touches is less than or equal to 7
-        if (touches.length < 3) {
+        // Only proceed if the number of touches is less than or equal to the maximum allowed
+        if (touches.length < 10) {
+          // You can adjust this limit
           const touch = e.changedTouches[0]; // Get the first touch (for simplicity, we use only one touch)
           highlightTouch(touch);
         }
