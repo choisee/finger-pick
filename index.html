@@ -14,14 +14,14 @@
         justify-content: center;
         align-items: center;
         background-color: black;
+        overflow: hidden;
       }
 
       #gameArea {
         width: 100%;
         height: 100%;
         position: relative;
-        background-color: gray;
-        padding: 5px;
+        background-color: black;
       }
 
       .touchHighlight {
@@ -53,7 +53,7 @@
         }
       }
 
-      .firework {
+      .firework1 {
         position: absolute;
         width: 10px;
         height: 10px;
@@ -78,11 +78,11 @@
         animation: fireworks 2s ease-out forwards;
       }
 
-      .firework:nth-child(even) {
-        background-color: #f00;
+      .firework1:nth-child(even) {
+        background-color: peru;
       }
 
-      .firework:nth-child(odd) {
+      .firework2:nth-child(odd) {
         background-color: #0f0;
       }
     </style>
@@ -169,25 +169,37 @@
         fireworksContainer.classList.remove("hidden");
         fireworksContainer.innerHTML = ""; // Clear any previous fireworks
 
-        // Create multiple firework elements
-        for (let i = 0; i < 10; i++) {
+        // Create 3 fireworks
+        createFireworks(10, 0);
+
+        // Create 2 fireworks after 1 second
+        setTimeout(() => createFireworks(8, 300), 300);
+
+        // Create 5 fireworks after 2 seconds
+        setTimeout(() => createFireworks(12, 200), 200);
+      }
+
+      // Function to create a group of fireworks
+      function createFireworks(count, delay) {
+        for (let i = 0; i < count; i++) {
           const firework = document.createElement("div");
-          firework.classList.add("firework");
+          firework.classList.add("firework" + (i % 2));
 
           // Random position and animation timing for fireworks
           firework.style.left = `${Math.random() * window.innerWidth}px`;
           firework.style.top = `${Math.random() * window.innerHeight}px`;
 
-          // Add firework to the container
-          fireworksContainer.appendChild(firework);
+          // Add firework to the container with a delay for each
+          setTimeout(() => {
+            fireworksContainer.appendChild(firework);
+          }, delay + i * 100); // Delay each firework slightly (100ms apart)
         }
 
         // Hide fireworks after animation completes
         setTimeout(() => {
           fireworksContainer.classList.add("hidden");
-        }, 5000); // After 1 second, hide the fireworks
+        }, delay + 3000); // Hide after 3 seconds from last firework
       }
-
       // Track touch move event
       gameArea.addEventListener("touchmove", (e) => {
         // Prevent default scroll/zoom behavior
