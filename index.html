@@ -38,11 +38,43 @@
 
       .touchHighlight {
         position: absolute;
+        width: 50px; /* Size of the highlight circle */
+        height: 50px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 10, 157, 0.6) 0%,
+          rgb(228, 114, 171) 99%
+        );
+        box-shadow: 0 0 15px 5px rgba(255, 10, 157, 0.5); /* Glowing effect */
+        pointer-events: none; /* Prevent interference with touches */
+        transition: opacity 0.5s ease-out; /* Smooth fade-out transition */
+        /* position: absolute;
         width: 50px;
         height: 50px;
         border-radius: 50%;
         background-color: rgba(255, 0, 0, 0.5);
-        pointer-events: none;
+        pointer-events: none; */
+      }
+
+      /* Optional: If you want the highlight to pulse, add a keyframe animation */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .touchHighlight.pulse {
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       .hidden {
@@ -115,8 +147,7 @@
       #resetButton {
         position: absolute;
         bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+        margin: 0 auto;
         font-size: 20px;
         padding: 10px 20px;
         background-color: #4caf50;
@@ -157,6 +188,8 @@
       function highlightTouch(touch) {
         const touchElement = document.createElement("div");
         touchElement.classList.add("touchHighlight");
+        // Optional: Add the pulse effect class
+        touchElement.classList.add("pulse"); // Add this line for the pulse effect
 
         // Set the position of the highlight based on the touch location
         touchElement.style.left = `${touch.clientX - 25}px`; // Centered on the touch
