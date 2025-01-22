@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>최후의 손가락</title>
+    <title>최후의 손가락!!</title>
     <style>
       body,
       html {
@@ -26,38 +26,30 @@
         overflow: hidden;
       }
 
-      /* Optional: Hide scrollbars for the entire page */
       ::-webkit-scrollbar {
-        display: none; /* For webkit-based browsers like Chrome and Safari */
+        display: none;
       }
 
       * {
-        -ms-overflow-style: none; /* For Internet Explorer */
-        scrollbar-width: none; /* For Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
       .touchHighlight {
         position: absolute;
-        width: 50px; /* Size of the highlight circle */
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         background: radial-gradient(
           circle,
           rgba(255, 10, 157, 0.6) 0%,
           rgb(228, 114, 171) 99%
         );
-        box-shadow: 0 0 15px 5px rgba(255, 10, 157, 0.5); /* Glowing effect */
-        pointer-events: none; /* Prevent interference with touches */
-        transition: opacity 0.5s ease-out; /* Smooth fade-out transition */
-        /* position: absolute;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: rgba(255, 0, 0, 0.5);
-        pointer-events: none; */
+        box-shadow: 0 0 15px 5px rgba(255, 10, 157, 0.5);
+        pointer-events: none;
+        transition: opacity 0.5s ease-out;
       }
 
-      /* Optional: If you want the highlight to pulse, add a keyframe animation */
       @keyframes pulse {
         0% {
           transform: scale(1);
@@ -81,7 +73,6 @@
         display: none;
       }
 
-      /* Fireworks animation */
       @keyframes fireworks {
         0% {
           transform: scale(0);
@@ -99,17 +90,17 @@
 
       .firework1 {
         position: absolute;
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         background-color: #ff0;
         border-radius: 50%;
-        animation: fireworks 1s ease-out forwards;
+        animation: fireworks 1.5s ease-out forwards;
       }
       .firework2 {
         position: absolute;
-        width: 10px;
-        height: 10px;
-        background-color: #ff0;
+        width: 13px;
+        height: 13px;
+        background-color: #0f0;
         border-radius: 50%;
         animation: fireworks 2s ease-out forwards;
       }
@@ -117,9 +108,9 @@
         position: absolute;
         width: 10px;
         height: 10px;
-        background-color: #ff0;
+        background-color: peru;
         border-radius: 50%;
-        animation: fireworks 2s ease-out forwards;
+        animation: fireworks 3s ease-out forwards;
       }
 
       .firework1:nth-child(even) {
@@ -147,15 +138,15 @@
         position: absolute;
         margin: auto;
         top: 15px;
-        font-size: 20px;
+        font-size: 300px;
         font-weight: bold;
-        color: magenta;
+        text-decoration: wavy;
+        color: #ff00ff4d;
         text-align: center;
       }
       #resultMessage.hidden {
         display: none;
       }
-      /* Reset Button Styling */
       #resetButton {
         position: absolute;
         bottom: 20px;
@@ -179,142 +170,113 @@
     <div id="gameArea"></div>
     <div id="fireworks" class="hidden"></div>
     <div id="timerDisplay">0:03</div>
-    <div id="resultMessage" class="hidden">당첨!!</div>
+    <!--  update with WAIT_FINGER -->
+    <div id="resultMessage" class="hidden">당첨</div>
     <button id="resetButton" class="hidden">다시하기</button>
 
     <script>
-      // Select the game area (the screen)
       const gameArea = document.getElementById("gameArea");
       const fireworksContainer = document.getElementById("fireworks");
       const timerDisplay = document.getElementById("timerDisplay");
       const resultMessage = document.getElementById("resultMessage");
       const resetButton = document.getElementById("resetButton");
 
-      let touches = []; // Store active touches
-      let timeoutID = null; // Timeout to track inactivity
-      let isGameActive = true; // Flag to control game activity (whether touches are allowed or not)
+      let touches = [];
+      let timeoutID = null;
+      let isGameActive = true;
       let WAIT_FINGER = 3; // sec - find "update with WAIT_FINGER"
-      let timerValue = WAIT_FINGER; // 5 minutes in seconds (300s)
-      let timerInterval = null; // Store the timer interval
+      let timerValue = WAIT_FINGER;
+      let timerInterval = null;
 
-      // Function to highlight touched areas
       function highlightTouch(touch) {
         const touchElement = document.createElement("div");
         touchElement.classList.add("touchHighlight");
-        // Optional: Add the pulse effect class
-        touchElement.classList.add("pulse"); // Add this line for the pulse effect
+        touchElement.classList.add("pulse");
 
-        // Set the position of the highlight based on the touch location
-        touchElement.style.left = `${touch.clientX - 25}px`; // Centered on the touch
+        touchElement.style.left = `${touch.clientX - 25}px`;
         touchElement.style.top = `${touch.clientY - 25}px`;
 
-        // Append it to the game area
         gameArea.appendChild(touchElement);
 
-        // Add this touch to the active touches array
         touches.push(touchElement);
 
-        // Clear previous timeout and set a new one to check for inactivity
         if (timeoutID) {
           clearTimeout(timeoutID);
           timerValue = WAIT_FINGER + 1;
           updateTimer();
         }
 
-        // Wait for 1 second after the last touch before starting to randomly remove highlights
         timeoutID = setTimeout(() => {
-          // Start the interval to remove highlights randomly after 1 second
           startRandomHighlightRemoval();
         }, 1000 * WAIT_FINGER);
       }
 
-      // Function to start removing highlights randomly
       function startRandomHighlightRemoval() {
-        isGameActive = false; // Disable further touch events
-        // Hide the timer display during this phase
+        isGameActive = false;
         timerDisplay.classList.add("hidden");
 
         let interval = setInterval(() => {
-          // If there is only 1 touch left, stop removing and trigger fireworks
           if (touches.length === 1) {
             clearInterval(interval);
             triggerFireworks();
             return;
           }
-          // Randomly pick an index from the active touches
           const randomIndex = Math.floor(Math.random() * touches.length);
           const touchToRemove = touches[randomIndex];
 
-          // Fade out the random touch highlight
           touchToRemove.style.opacity = "0";
 
-          // Remove it from the touches array and DOM after fading
           setTimeout(() => {
             gameArea.removeChild(touchToRemove);
-            touches.splice(randomIndex, 1); // Remove from the touches array
-          }, 500); // Wait a bit to allow fade-out before removing it
-        }, 1000); // Remove one highlight every 1 second
+            touches.splice(randomIndex, 1);
+          }, 500);
+        }, 1000);
       }
 
-      // Function to trigger fireworks animation
       function triggerFireworks() {
         fireworksContainer.classList.remove("hidden");
-        fireworksContainer.innerHTML = ""; // Clear any previous fireworks
+        fireworksContainer.innerHTML = "";
 
-        // Create 3 fireworks
         createFireworks(10, 0);
-
-        // Create 2 fireworks after 1 second
         setTimeout(() => createFireworks(8, 300), 300);
-
-        // Create 5 fireworks after 2 seconds
         setTimeout(() => createFireworks(12, 200), 200);
 
-        // Show the reset button after fireworks finish
         setTimeout(() => {
           resultMessage.classList.remove("hidden");
           resetButton.classList.remove("hidden");
-        }, 500); // Show after fireworks animation ends (3 seconds)
+        }, 500);
       }
 
-      // Function to create a group of fireworks
       function createFireworks(count, delay) {
         for (let i = 0; i < count; i++) {
           const firework = document.createElement("div");
           firework.classList.add("firework" + (i % 3));
 
-          // Random position and animation timing for fireworks
           firework.style.left = `${Math.random() * window.innerWidth}px`;
           firework.style.top = `${Math.random() * window.innerHeight}px`;
 
-          // Add firework to the container with a delay for each
           setTimeout(() => {
             fireworksContainer.appendChild(firework);
-          }, delay + i * 100); // Delay each firework slightly (100ms apart)
+          }, delay + i * 100);
         }
 
-        // Hide fireworks after animation completes
         setTimeout(() => {
           fireworksContainer.classList.add("hidden");
-        }, delay + 3000); // Hide after 3 seconds from last firework
+        }, delay + 3000);
       }
 
-      // Function to update the timer display
       function updateTimer() {
         if (timerValue <= 0) {
-          clearInterval(timerInterval); // Stop the timer once it's 0
+          clearInterval(timerInterval);
           if (touches.length === 0) {
-            // Disable touch events and show reset button when the timer hits 0:00
             isGameActive = false;
             resetButton.classList.remove("hidden");
           }
           return;
         }
 
-        // Update the timer value (subtract 1 second each time)
         timerValue--;
 
-        // Convert timer value into minutes and seconds format
         const minutes = Math.floor(timerValue / 60);
         const seconds = timerValue % 60;
         timerDisplay.textContent = `${minutes}:${
@@ -322,58 +284,43 @@
         }${seconds}`;
       }
 
-      // Start the Pomodoro-like timer
       timerInterval = setInterval(updateTimer, 1000);
-      //   // Start the Pomodoro-like timer
-      //   let timerInterval = setInterval(updateTimer, 1000);
 
-      // Track touch start event
       gameArea.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Prevent default scrolling/zoom behavior
+        e.preventDefault();
 
-        // Only proceed if the number of touches is less than or equal to the maximum allowed
         if (touches.length < 10 && isGameActive) {
-          const touch = e.changedTouches[0]; // Get the first touch (for simplicity, we use only one touch)
+          const touch = e.changedTouches[0];
           highlightTouch(touch);
         }
       });
 
-      // Track touch move event
       gameArea.addEventListener("touchmove", (e) => {
-        // Prevent default scroll/zoom behavior
         e.preventDefault();
-        // Optionally, track touch moves if necessary
       });
 
-      // Track touch end event (remove the touch highlight)
       gameArea.addEventListener("touchend", (e) => {
         e.preventDefault();
-        // For simplicity, we don't handle touch end explicitly here
       });
 
-      // Reset Game to start a new round
       resetButton.addEventListener("click", resetGame);
 
       function resetGame() {
-        // Clear all touch highlights and reset variables
         touches.forEach((touch) => gameArea.removeChild(touch));
         touches = [];
 
-        // Reset game state variables
         isGameActive = true;
         timerValue = WAIT_FINGER;
         timerDisplay.textContent = "0:03"; // update with WAIT_FINGER
         timerDisplay.classList.remove("hidden");
 
         resultMessage.classList.add("hidden");
-        // Hide the reset button and restart the timer
         resetButton.classList.add("hidden");
         clearInterval(timerInterval);
         timerInterval = setInterval(updateTimer, 1000);
 
-        // Reset fireworks container
         fireworksContainer.classList.add("hidden");
-        timeoutID = null; // Timeout to track inactivity
+        timeoutID = null;
       }
     </script>
   </body>
